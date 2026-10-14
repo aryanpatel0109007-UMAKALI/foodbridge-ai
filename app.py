@@ -4,7 +4,51 @@ from sklearn.tree import DecisionTreeClassifier
 
 st.set_page_config(page_title="FoodBridge AI", page_icon="🍲", layout="wide")
 
-
+```python
+# FoodBridge AI - Visual Enhancements
+st.markdown("""
+<style>
+.foodbridge-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 18px 0 24px 0;
+}
+.foodbridge-card {
+    background: white;
+    border: 1px solid #dcebe0;
+    border-radius: 18px;
+    padding: 12px;
+    box-shadow: 0 6px 20px rgba(20, 90, 50, 0.07);
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+.foodbridge-card:hover {
+    transform: translateY(-4px);
+}
+.foodbridge-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+.foodbridge-card h4 {
+    color: #176440;
+    margin: 12px 0 5px 0;
+}
+.foodbridge-card p {
+    color: #62766a;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+@media (max-width: 650px) {
+    .foodbridge-gallery {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+""", unsafe_allow_html=True)
+```
 
 st.markdown("""
 <style>
