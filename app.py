@@ -380,7 +380,6 @@ if "donations" not in st.session_state:
     st.session_state.donations = []
 
 
-st.markdown("""
 
 st.markdown("""
 <div class="hero">
