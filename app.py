@@ -182,33 +182,46 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Food photos and friendly cartoon cards
-st.markdown("""
-<div class="foodbridge-gallery">
+```python
+# FoodBridge AI - Food Photos and Cartoon Cards
+st.markdown("## 🌱 Share Food, Share Hope")
+st.write("Every meal matters. Help reduce food waste and support our community.")
 
-    <div class="foodbridge-card">
-        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80">
-        <h4>🥗 Fresh Food, Fresh Hope</h4>
-        <p>Share good food instead of wasting it.</p>
-    </div>
+photo1, photo2, photo3 = st.columns(3)
 
-    <div class="foodbridge-card">
-        <div style="background:#e6f5e9;border-radius:12px;padding:24px 10px;font-size:66px;">
-            🧑‍🍳
-        </div>
-        <h4>🤝 Be a Food Hero</h4>
-        <p>Every volunteer can make a difference.</p>
-    </div>
+with photo1:
+    with st.container(border=True):
+        st.image(
+            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c"
+            "?auto=format&fit=crop&w=600&q=80",
+            use_container_width=True
+        )
+        st.subheader("🥗 Fresh Food")
+        st.write("Share surplus food instead of wasting it.")
 
-    <div class="foodbridge-card">
-        <img src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80">
-        <h4>🍲 Share a Meal</h4>
-        <p>Connect surplus food with community needs.</p>
-    </div>
+with photo2:
+    with st.container(border=True):
+        st.markdown(
+            "<div style='background:#e8f6ec; border-radius:16px;"
+            "padding:30px; text-align:center;'>"
+            "<div style='font-size:75px;'>🧑‍🍳</div>"
+            "<h3 style='color:#176440;'>Food Hero</h3>"
+            "</div>",
+            unsafe_allow_html=True
+        )
+        st.subheader("🤝 Be a Food Hero")
+        st.write("Small acts of kindness can make a difference.")
 
-</div>
-""", unsafe_allow_html=True)
-
+with photo3:
+    with st.container(border=True):
+        st.image(
+            "https://images.unsplash.com/photo-1547592180-85f173990554"
+            "?auto=format&fit=crop&w=600&q=80",
+            use_container_width=True
+        )
+        st.subheader("🍲 Share a Meal")
+        st.write("Help connect surplus food with community needs.")
+```
 st.warning(
     "Demo only: priority is predicted from artificial practice data. "
     "It does not determine whether food is safe to eat. Do not enter private information."
