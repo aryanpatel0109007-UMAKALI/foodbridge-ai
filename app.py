@@ -383,88 +383,15 @@ if "donations" not in st.session_state:
 
 st.markdown("""
 <div class="hero">
-  <div class="hero-layout">
-    <div class="hero-copy">
-      <div class="tag">SDG 02 · ZERO HUNGER</div>
-      <h1>🍃 FoodBridge AI</h1>
-      <p>
+    <div class="tag">SDG 02 · ZERO HUNGER</div>
+    <h1>🍃 FoodBridge AI</h1>
+    <p>
         Good food deserves a second chance. Connect surplus food
         with community needs, record donations and explore an AI-powered
         priority demonstration — one meal at a time.
-      </p>
-      <div class="hero-pills">
-        <span class="hero-pill">🌱 Reduce Food Waste</span>
-        <span class="hero-pill">🤝 Help Communities</span>
-        <span class="hero-pill">🍲 Share Hope</span>
-      </div>
-    </div>
-
-    <div class="hero-visual">
-      <div class="visual-badge badge-top">💚 Food Hero</div>
-
-      <svg class="hero-art-svg"
-           viewBox="0 0 340 280"
-           xmlns="http://www.w3.org/2000/svg"
-           role="img"
-           aria-label="Illustration of a healthy meal">
-
-        <circle cx="170" cy="140" r="117" fill="#b8f0ca" opacity=".30"/>
-        <circle cx="170" cy="140" r="91" fill="#ffffff" opacity=".15"/>
-
-        <ellipse cx="170" cy="224" rx="95" ry="15"
-                 fill="#073c29" opacity=".22"/>
-
-        <circle cx="170" cy="137" r="87"
-                fill="#ffffff" stroke="#d8f0df" stroke-width="5"/>
-        <circle cx="170" cy="137" r="70" fill="#eaf8ed"/>
-
-        <path d="M133 100 Q147 85 157 103 L175 151
-                 L152 163 L125 119 Z"
-              fill="#f49a43"/>
-        <path d="M139 111 L158 150 M134 120 L151 134"
-              stroke="#ffcf8d" stroke-width="4" stroke-linecap="round"/>
-
-        <circle cx="194" cy="108" r="19" fill="#3c9f59"/>
-        <circle cx="213" cy="120" r="17" fill="#55b56b"/>
-        <circle cx="192" cy="129" r="18" fill="#2e8648"/>
-        <circle cx="202" cy="110" r="6" fill="#8bdaa0"/>
-
-        <circle cx="198" cy="163" r="19" fill="#e75b52"/>
-        <circle cx="192" cy="157" r="5" fill="#ffaaa0"/>
-        <path d="M197 145 Q201 137 207 142"
-              fill="none" stroke="#348a4b"
-              stroke-width="4" stroke-linecap="round"/>
-
-        <path d="M126 177 Q141 151 157 178
-                 Q143 192 126 177 Z"
-              fill="#76c78a"/>
-        <path d="M130 177 L151 174"
-              stroke="#e8ffeb" stroke-width="2"/>
-
-        <path d="M95 91 Q71 52 105 43 Q131 53 117 80"
-              fill="#8adba1" stroke="#d7ffe0" stroke-width="2"/>
-        <path d="M105 83 L103 53"
-              stroke="#f0fff3" stroke-width="3"/>
-
-        <path d="M231 182 Q266 159 277 184
-                 Q264 209 231 182 Z"
-              fill="#55bb73"/>
-        <path d="M237 184 L268 184"
-              stroke="#c7f7d3" stroke-width="2"/>
-
-        <path d="M154 58 Q145 42 157 34
-                 M176 54 Q187 37 179 28"
-              stroke="#e8fff0" stroke-width="5"
-              stroke-linecap="round" fill="none"
-              opacity=".8"/>
-      </svg>
-
-      <div class="visual-badge badge-bottom">🍲 Share • Care • Connect</div>
-    </div>
-  </div>
+    </p>
 </div>
 """, unsafe_allow_html=True)
-
 
 # FoodBridge AI - Food Photos and Cartoon Cards
 st.markdown("## 🌱 Share Food, Share Hope")
