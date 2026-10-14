@@ -4,7 +4,7 @@ from sklearn.tree import DecisionTreeClassifier
 
 st.set_page_config(page_title="FoodBridge AI", page_icon="🍲", layout="wide")
 
-```python
+
 # FoodBridge AI - Visual Enhancements
 st.markdown("""
 <style>
