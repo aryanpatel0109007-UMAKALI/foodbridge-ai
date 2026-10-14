@@ -4,6 +4,57 @@ from sklearn.tree import DecisionTreeClassifier
 
 st.set_page_config(page_title="FoodBridge AI", page_icon="🍲", layout="wide")
 
+st.markdown("""
+<style>
+.stApp {
+    background: #f4f8f3;
+    color: #183b2a;
+}
+.block-container {
+    max-width: 1200px;
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+}
+h1 {
+    color: #176b43 !important;
+    font-weight: 800 !important;
+}
+h2, h3 {
+    color: #205c3b !important;
+    font-weight: 700 !important;
+}
+div[data-testid="stMetric"] {
+    background: white;
+    border: 1px solid #dce9dd;
+    padding: 18px;
+    border-radius: 16px;
+    box-shadow: 0 4px 14px rgba(20, 80, 40, 0.06);
+}
+div[data-testid="stForm"] {
+    background: white;
+    padding: 24px;
+    border: 1px solid #dce9dd;
+    border-radius: 18px;
+}
+.stButton button, .stFormSubmitButton button {
+    background: #16764b;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    min-height: 44px;
+}
+.stButton button:hover, .stFormSubmitButton button:hover {
+    background: #105637;
+    color: white;
+}
+div[data-testid="stDataFrame"] {
+    border-radius: 12px;
+    overflow: hidden;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # IMPORTANT: this is a demo model trained on artificial practice data.
 # It is not a food-safety assessment or a real-world donation priority model.
 training_df = pd.DataFrame({"hours_until_expiry": list(range(1, 16))})
