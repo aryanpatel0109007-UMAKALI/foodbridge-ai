@@ -193,6 +193,176 @@ div[data-testid="stVerticalBlockBorderWrapper"]:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 25px rgba(23, 75, 50, 0.10);
 }
+
+/* Premium animated hero banner */
+.hero {
+    position: relative;
+    overflow: hidden;
+    background-size: 200% 200%;
+    animation: heroEntrance 0.8s ease-out both,
+               heroGradient 9s ease-in-out infinite;
+}
+
+/* Gentle floating title */
+.hero h1 {
+    animation: titleFloat 3.5s ease-in-out infinite;
+}
+
+/* Floating leaf decoration */
+.hero::after {
+    content: "🌿";
+    position: absolute;
+    right: 28px;
+    bottom: 8px;
+    font-size: 76px;
+    opacity: 0.20;
+    pointer-events: none;
+    animation: leafDrift 5s ease-in-out infinite;
+}
+
+/* Moving green gradient */
+@keyframes heroGradient {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* Floating title animation */
+@keyframes titleFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+/* Floating leaf animation */
+@keyframes leafDrift {
+    0%, 100% {
+        transform: rotate(-8deg) translateY(0);
+    }
+    50% {
+        transform: rotate(8deg) translateY(-12px);
+    }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .hero, .hero h1, .hero::after {
+        animation: none !important;
+    }
+}
+
+
+/* Premium FoodBridge hero graphics */
+.hero-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: center;
+    gap: 24px;
+}
+
+.hero-copy {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-visual {
+    position: relative;
+    min-height: 275px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-art-svg {
+    width: 100%;
+    max-width: 350px;
+    height: auto;
+    overflow: visible;
+    filter: drop-shadow(0 15px 22px rgba(0, 45, 20, .16));
+    animation: foodArtFloat 4s ease-in-out infinite;
+}
+
+.visual-badge {
+    position: absolute;
+    z-index: 3;
+    padding: 11px 15px;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #175c3a;
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 8px 24px rgba(0, 40, 20, .17);
+    animation: badgeFloat 3.5s ease-in-out infinite;
+}
+
+.badge-top {
+    top: 20px;
+    right: 0;
+}
+
+.badge-bottom {
+    bottom: 15px;
+    left: 0;
+    animation-delay: .7s;
+}
+
+.hero-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 22px;
+}
+
+.hero-pill {
+    background: rgba(255,255,255,.13);
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 30px;
+    padding: 8px 12px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+@keyframes foodArtFloat {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50% { transform: translateY(-9px) rotate(1deg); }
+}
+
+@keyframes badgeFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+@media (max-width: 700px) {
+    .hero-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-visual {
+        min-height: 230px;
+        margin-top: 10px;
+    }
+
+    .hero-art-svg {
+        max-width: 290px;
+    }
+
+    .badge-top { right: 2px; }
+    .badge-bottom { left: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-art-svg, .visual-badge {
+        animation: none !important;
+    }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -211,12 +381,88 @@ if "donations" not in st.session_state:
 
 
 st.markdown("""
+
+st.markdown("""
 <div class="hero">
-    <div class="tag">SDG 02 · ZERO HUNGER</div>
-    <h1>🍃 FoodBridge AI</h1>
-    <p>Good food deserves a second chance. Connect surplus food
-    with community needs, record donations and explore an AI-powered
-    priority demonstration — one meal at a time.</p>
+  <div class="hero-layout">
+    <div class="hero-copy">
+      <div class="tag">SDG 02 · ZERO HUNGER</div>
+      <h1>🍃 FoodBridge AI</h1>
+      <p>
+        Good food deserves a second chance. Connect surplus food
+        with community needs, record donations and explore an AI-powered
+        priority demonstration — one meal at a time.
+      </p>
+      <div class="hero-pills">
+        <span class="hero-pill">🌱 Reduce Food Waste</span>
+        <span class="hero-pill">🤝 Help Communities</span>
+        <span class="hero-pill">🍲 Share Hope</span>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="visual-badge badge-top">💚 Food Hero</div>
+
+      <svg class="hero-art-svg"
+           viewBox="0 0 340 280"
+           xmlns="http://www.w3.org/2000/svg"
+           role="img"
+           aria-label="Illustration of a healthy meal">
+
+        <circle cx="170" cy="140" r="117" fill="#b8f0ca" opacity=".30"/>
+        <circle cx="170" cy="140" r="91" fill="#ffffff" opacity=".15"/>
+
+        <ellipse cx="170" cy="224" rx="95" ry="15"
+                 fill="#073c29" opacity=".22"/>
+
+        <circle cx="170" cy="137" r="87"
+                fill="#ffffff" stroke="#d8f0df" stroke-width="5"/>
+        <circle cx="170" cy="137" r="70" fill="#eaf8ed"/>
+
+        <path d="M133 100 Q147 85 157 103 L175 151
+                 L152 163 L125 119 Z"
+              fill="#f49a43"/>
+        <path d="M139 111 L158 150 M134 120 L151 134"
+              stroke="#ffcf8d" stroke-width="4" stroke-linecap="round"/>
+
+        <circle cx="194" cy="108" r="19" fill="#3c9f59"/>
+        <circle cx="213" cy="120" r="17" fill="#55b56b"/>
+        <circle cx="192" cy="129" r="18" fill="#2e8648"/>
+        <circle cx="202" cy="110" r="6" fill="#8bdaa0"/>
+
+        <circle cx="198" cy="163" r="19" fill="#e75b52"/>
+        <circle cx="192" cy="157" r="5" fill="#ffaaa0"/>
+        <path d="M197 145 Q201 137 207 142"
+              fill="none" stroke="#348a4b"
+              stroke-width="4" stroke-linecap="round"/>
+
+        <path d="M126 177 Q141 151 157 178
+                 Q143 192 126 177 Z"
+              fill="#76c78a"/>
+        <path d="M130 177 L151 174"
+              stroke="#e8ffeb" stroke-width="2"/>
+
+        <path d="M95 91 Q71 52 105 43 Q131 53 117 80"
+              fill="#8adba1" stroke="#d7ffe0" stroke-width="2"/>
+        <path d="M105 83 L103 53"
+              stroke="#f0fff3" stroke-width="3"/>
+
+        <path d="M231 182 Q266 159 277 184
+                 Q264 209 231 182 Z"
+              fill="#55bb73"/>
+        <path d="M237 184 L268 184"
+              stroke="#c7f7d3" stroke-width="2"/>
+
+        <path d="M154 58 Q145 42 157 34
+                 M176 54 Q187 37 179 28"
+              stroke="#e8fff0" stroke-width="5"
+              stroke-linecap="round" fill="none"
+              opacity=".8"/>
+      </svg>
+
+      <div class="visual-badge badge-bottom">🍲 Share • Care • Connect</div>
+    </div>
+  </div>
 </div>
 """, unsafe_allow_html=True)
 
