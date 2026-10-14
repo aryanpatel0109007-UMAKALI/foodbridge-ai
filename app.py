@@ -182,7 +182,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-```python
+
 # FoodBridge AI - Food Photos and Cartoon Cards
 st.markdown("## 🌱 Share Food, Share Hope")
 st.write("Every meal matters. Help reduce food waste and support our community.")
@@ -221,7 +221,7 @@ with photo3:
         )
         st.subheader("🍲 Share a Meal")
         st.write("Help connect surplus food with community needs.")
-```
+
 st.warning(
     "Demo only: priority is predicted from artificial practice data. "
     "It does not determine whether food is safe to eat. Do not enter private information."
