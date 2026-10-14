@@ -155,6 +155,44 @@ hr {
     .block-container { padding: 1rem; }
     .hero { padding: 27px 22px; border-radius: 20px; }
 }
+
+/* Hero animation */
+.hero {
+    animation: heroEntrance 0.8s ease-out both;
+}
+
+@keyframes heroEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Food photo hover effect */
+div[data-testid="stImage"] img {
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+div[data-testid="stImage"] img:hover {
+    transform: scale(1.03);
+    box-shadow: 0 10px 22px rgba(23, 75, 50, 0.16);
+}
+
+/* Card hover effect */
+div[data-testid="stVerticalBlockBorderWrapper"] {
+    border-radius: 18px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"]:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(23, 75, 50, 0.10);
+}
 </style>
 """, unsafe_allow_html=True)
 
