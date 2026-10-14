@@ -182,6 +182,33 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# Food photos and friendly cartoon cards
+st.markdown("""
+<div class="foodbridge-gallery">
+
+    <div class="foodbridge-card">
+        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80">
+        <h4>🥗 Fresh Food, Fresh Hope</h4>
+        <p>Share good food instead of wasting it.</p>
+    </div>
+
+    <div class="foodbridge-card">
+        <div style="background:#e6f5e9;border-radius:12px;padding:24px 10px;font-size:66px;">
+            🧑‍🍳
+        </div>
+        <h4>🤝 Be a Food Hero</h4>
+        <p>Every volunteer can make a difference.</p>
+    </div>
+
+    <div class="foodbridge-card">
+        <img src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80">
+        <h4>🍲 Share a Meal</h4>
+        <p>Connect surplus food with community needs.</p>
+    </div>
+
+</div>
+""", unsafe_allow_html=True)
+
 st.warning(
     "Demo only: priority is predicted from artificial practice data. "
     "It does not determine whether food is safe to eat. Do not enter private information."
