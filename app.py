@@ -307,6 +307,17 @@ col2.metric("Total meals recorded", total_meals)
 if df.empty:
     st.info("No donations added yet. Enter a donation in the form above to see it here.")
 else:
+    
+    priority_col1, priority_col2, priority_col3 = st.columns(3)
+
+    high_count = int((df["Demo Priority"] == "High").sum())
+    medium_count = int((df["Demo Priority"] == "Medium").sum())
+    low_count = int((df["Demo Priority"] == "Low").sum())
+
+    priority_col1.metric("🔴 High Priority", high_count)
+    priority_col2.metric("🟡 Medium Priority", medium_count)
+    priority_col3.metric("🟢 Low Priority", low_count)
+
     st.dataframe(df, use_container_width=True, hide_index=True)
     totals_by_location = df.groupby("Location", as_index=True)["Meals"].sum().sort_values(ascending=False)
     st.subheader("Meals recorded by location")
