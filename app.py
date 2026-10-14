@@ -4,56 +4,116 @@ from sklearn.tree import DecisionTreeClassifier
 
 st.set_page_config(page_title="FoodBridge AI", page_icon="🍲", layout="wide")
 
+
+
 st.markdown("""
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 .stApp {
-    background: #f4f8f3;
+    background: linear-gradient(180deg, #f2f8f2 0%, #ffffff 55%, #eef7f0 100%);
     color: #183b2a;
+    font-family: 'Inter', sans-serif;
 }
 .block-container {
-    max-width: 1200px;
+    max-width: 1220px;
     padding-top: 2rem;
     padding-bottom: 3rem;
 }
-h1 {
-    color: #176b43 !important;
+h1, h2, h3 {
+    color: #174b32 !important;
     font-weight: 800 !important;
 }
-h2, h3 {
-    color: #205c3b !important;
-    font-weight: 700 !important;
+.hero {
+    background: linear-gradient(125deg, #103b2b, #16764b 60%, #42a66a);
+    padding: 42px 38px;
+    border-radius: 26px;
+    margin: 8px 0 26px 0;
+    color: white;
+    box-shadow: 0 18px 45px rgba(16, 75, 45, .18);
+}
+.hero .tag {
+    color: #c7f7d5;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+}
+.hero h1 {
+    color: white !important;
+    font-size: clamp(30px, 4vw, 46px);
+    line-height: 1.15;
+    margin: 0 0 14px 0;
+}
+.hero p {
+    color: #e3f7e9;
+    font-size: 16px;
+    line-height: 1.8;
+    max-width: 720px;
+    margin: 0;
 }
 div[data-testid="stMetric"] {
     background: white;
-    border: 1px solid #dce9dd;
-    padding: 18px;
-    border-radius: 16px;
-    box-shadow: 0 4px 14px rgba(20, 80, 40, 0.06);
+    border: 1px solid #deeadf;
+    border-radius: 19px;
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(23, 75, 50, .06);
+}
+div[data-testid="stMetricLabel"] {
+    color: #647c6b;
+    font-weight: 600;
+}
+div[data-testid="stMetricValue"] {
+    color: #16764b;
+    font-weight: 800;
 }
 div[data-testid="stForm"] {
     background: white;
-    padding: 24px;
     border: 1px solid #dce9dd;
-    border-radius: 18px;
+    border-radius: 22px;
+    padding: 26px;
+    box-shadow: 0 10px 35px rgba(23, 75, 50, .055);
 }
-.stButton button, .stFormSubmitButton button {
-    background: #16764b;
+.stTextInput input, .stNumberInput input {
+    border-radius: 11px;
+    min-height: 43px;
+}
+.stButton button, .stFormSubmitButton button,
+.stDownloadButton button {
+    background: linear-gradient(110deg, #16764b, #23945d);
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
+    min-height: 46px;
     font-weight: 700;
-    min-height: 44px;
+    transition: .2s ease;
 }
-.stButton button:hover, .stFormSubmitButton button:hover {
+.stButton button:hover, .stFormSubmitButton button:hover,
+.stDownloadButton button:hover {
     background: #105637;
     color: white;
+    border: none;
+    transform: translateY(-1px);
+}
+div[data-testid="stAlert"] {
+    border-radius: 14px;
 }
 div[data-testid="stDataFrame"] {
-    border-radius: 12px;
+    background: white;
+    border: 1px solid #deeadf;
+    border-radius: 16px;
     overflow: hidden;
+}
+hr {
+    border-color: #dfebdf;
+}
+@media (max-width: 700px) {
+    .block-container { padding: 1rem; }
+    .hero { padding: 27px 22px; border-radius: 20px; }
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 # IMPORTANT: this is a demo model trained on artificial practice data.
 # It is not a food-safety assessment or a real-world donation priority model.
@@ -67,8 +127,17 @@ model.fit(training_df[["hours_until_expiry"]], training_df["priority"])
 if "donations" not in st.session_state:
     st.session_state.donations = []
 
-st.title("🍲 FoodBridge AI — Zero Hunger")
-st.write("Register surplus-food donations and view a simple donation dashboard.")
+
+st.markdown("""
+<div class="hero">
+    <div class="tag">SDG 02 · ZERO HUNGER</div>
+    <h1>🍃 FoodBridge AI</h1>
+    <p>Good food deserves a second chance. Connect surplus food
+    with community needs, record donations and explore an AI-powered
+    priority demonstration — one meal at a time.</p>
+</div>
+""", unsafe_allow_html=True)
+
 st.warning(
     "Demo only: priority is predicted from artificial practice data. "
     "It does not determine whether food is safe to eat. Do not enter private information."
