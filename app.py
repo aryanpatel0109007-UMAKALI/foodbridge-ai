@@ -22,33 +22,62 @@ def init_database():
                 hours_until_expiry REAL NOT NULL,
                 location TEXT NOT NULL,
                 demo_priority TEXT NOT NULL,
+                donated_by TEXT NOT NULL DEFAULT '',
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
         """)
 
+        # Add column to an existing database if needed
+        columns = {
+            row[1]
+            for row in conn.execute(
+                "PRAGMA table_info(donations)"
+            ).fetchall()
+        }
 
-def save_donation(food, meals, hours, location, priority):
+        if "donated_by" not in columns:
+            conn.execute("""
+                ALTER TABLE donations
+                ADD COLUMN donated_by TEXT NOT NULL DEFAULT ''
+            """)
+
+
+def save_donation(food, meals, hours, location, priority, donated_by):
     with sqlite3.connect(DB_FILE) as conn:
         conn.execute("""
-            INSERT INTO donations
-            (food, meals, hours_until_expiry, location, demo_priority)
-            VALUES (?, ?, ?, ?, ?)
-        """, (food, meals, hours, location, priority))
+            INSERT INTO donations (
+                food, meals, hours_until_expiry,
+                location, demo_priority, donated_by
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            food, meals, hours, location, priority, donated_by
+        ))
 
 
-def load_donations():
+def load_donations(show_all=False, username=None):
+    query = """
+        SELECT
+            food AS "Food",
+            meals AS "Meals",
+            hours_until_expiry AS "Hours Until Expiry",
+            location AS "Location",
+            demo_priority AS "Demo Priority"
+        FROM donations
+    """
+
+    params = ()
+
+    if not show_all:
+        query += " WHERE donated_by = ?"
+        params = (username or "",)
+
+    query += " ORDER BY id"
+
     with sqlite3.connect(DB_FILE) as conn:
-        return pd.read_sql_query("""
-            SELECT
-                food AS "Food",
-                meals AS "Meals",
-                hours_until_expiry AS "Hours Until Expiry",
-                location AS "Location",
-                demo_priority AS "Demo Priority"
-            FROM donations
-            ORDER BY id
-        """, conn)
-
+        return pd.read_sql_query(
+            query, conn, params=params
+        )
 
 init_database()
 
@@ -765,6 +794,7 @@ if submitted:
             hours=float(hours),
             location=location.strip(),
             priority=str(prediction)
+            donated_by=st.session_state.fb_username
         )
 
         st.success(
@@ -773,7 +803,12 @@ if submitted:
         )        
 st.divider()
 st.subheader("Donation dashboard")
-df = load_donations()
+current_role = st.session_state.get("fb_role", "Donor")
+
+df = load_donations(
+    show_all=(current_role == "NGO"),
+    username=st.session_state.get("fb_username")
+)
 total_donations = len(df)
 total_meals = int(df["Meals"].sum()) if not df.empty else 0
 col1, col2 = st.columns(2)
@@ -895,7 +930,7 @@ else:
         hide_index=True
     )
 
-    donations_for_matching = load_donations()
+  donations_for_matching = load_donations(show_all=True)
 
     if donations_for_matching.empty:
         st.info(
