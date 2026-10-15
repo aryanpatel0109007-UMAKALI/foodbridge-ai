@@ -211,6 +211,14 @@ st.markdown("""
         grid-template-columns: 1fr;
     }
 }
+
+/* Fix invisible login labels and tabs */
+.stApp label,
+div[data-testid="stTabs"] button,
+div[data-testid="stTabs"] button p {
+    color: #183b2a !important;
+    opacity: 1 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
