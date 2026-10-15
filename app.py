@@ -558,6 +558,8 @@ div[data-testid="stVerticalBlockBorderWrapper"]:hover {
 </style>
 """, unsafe_allow_html=True)
 
+
+
 # ========== LOGIN AND SIGNUP UI ==========
 
 if "fb_logged_in" not in st.session_state:
@@ -635,7 +637,6 @@ if not st.session_state.fb_logged_in:
                     )
 
     st.stop()
-
 # Sidebar account information
 st.sidebar.markdown("### 👤 My Account")
 st.sidebar.write(
