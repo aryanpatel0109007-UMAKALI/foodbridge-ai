@@ -564,6 +564,25 @@ if "fb_logged_in" not in st.session_state:
     st.session_state.fb_logged_in = False
 
 if not st.session_state.fb_logged_in:
+        st.markdown("""
+    <style>
+    div[data-testid="stTabs"] [role="tab"],
+    div[data-testid="stTabs"] [role="tab"] *,
+    div[data-testid="stTabs"] [data-baseweb="tab-list"] * {
+        color: #183b2a !important;
+        -webkit-text-fill-color: #183b2a !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    div[data-testid="stTabs"] [role="tab"][aria-selected="true"],
+    div[data-testid="stTabs"] [role="tab"][aria-selected="true"] * {
+        color: #16764b !important;
+        -webkit-text-fill-color: #16764b !important;
+        font-weight: 700 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
     st.title("🔐 FoodBridge AI Login")
     st.write("Login or create an account to continue.")
 
