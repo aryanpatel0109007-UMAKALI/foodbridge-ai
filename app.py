@@ -931,7 +931,7 @@ else:
         hide_index=True
     )
 
-  donations_for_matching = load_donations(show_all=True)
+      donations_for_matching = load_donations(show_all=True)
 
     if donations_for_matching.empty:
         st.info(
