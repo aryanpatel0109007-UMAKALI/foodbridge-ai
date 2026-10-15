@@ -50,7 +50,47 @@ def load_donations():
 init_database()
 
 # ========== END DATABASE FUNCTIONS ==========
+# ========== NGO DATABASE ==========
 
+def init_ngo_database():
+    with sqlite3.connect(DB_FILE) as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS ngo_partners (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                location TEXT NOT NULL,
+                public_contact TEXT DEFAULT '',
+                meal_capacity INTEGER NOT NULL,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+
+def save_ngo_partner(name, location, contact, capacity):
+    with sqlite3.connect(DB_FILE) as conn:
+        conn.execute("""
+            INSERT INTO ngo_partners
+            (name, location, public_contact, meal_capacity)
+            VALUES (?, ?, ?, ?)
+        """, (name, location, contact, capacity))
+
+
+def load_ngo_partners():
+    with sqlite3.connect(DB_FILE) as conn:
+        return pd.read_sql_query("""
+            SELECT
+                name AS "NGO Name",
+                location AS "Location",
+                public_contact AS "Public Contact",
+                meal_capacity AS "Daily Meal Capacity"
+            FROM ngo_partners
+            ORDER BY name
+        """, conn)
+
+
+init_ngo_database()
+
+# ========== END NGO DATABASE ==========
 # FoodBridge AI - Visual Enhancements
 st.markdown("""
 <style>
@@ -557,7 +597,163 @@ st.caption(
     "Download the CSV to keep a copy. A persistent database is needed before real-world use."
 )
 
+# ========== NGO MATCHING SYSTEM ==========
+
+st.divider()
+st.subheader("🤝 NGO Matching System")
+
+st.caption(
+    "Register NGO partners and find potential matches "
+    "for available food donations."
+)
+
+with st.expander("➕ Register a New NGO", expanded=False):
+    with st.form("ngo_registration_form", clear_on_submit=True):
+        ngo_name = st.text_input("NGO Name")
+        ngo_location = st.text_input(
+            "NGO Location / Service Area",
+            placeholder="e.g. Ahmedabad or Kuvasana, Patan"
+        )
+        ngo_contact = st.text_input(
+            "Public Contact (optional)",
+            placeholder="Official phone or email"
+        )
+        ngo_capacity = st.number_input(
+            "Daily Meal Capacity",
+            min_value=1,
+            value=50,
+            step=10
+        )
+
+        register_ngo = st.form_submit_button("Register NGO")
+
+if register_ngo:
+    if not ngo_name.strip():
+        st.error("Please enter the NGO name.")
+    elif not ngo_location.strip():
+        st.error("Please enter the NGO location.")
+    else:
+        save_ngo_partner(
+            ngo_name.strip(),
+            ngo_location.strip(),
+            ngo_contact.strip(),
+            int(ngo_capacity)
+        )
+        st.success("NGO registered successfully!")
+        st.rerun()
+
+
+ngo_df = load_ngo_partners()
+
+if ngo_df.empty:
+    st.info(
+        "No NGO partners registered yet. "
+        "Register an NGO above to begin matching."
+    )
+else:
+    st.markdown("### Registered NGO Partners")
+    st.dataframe(
+        ngo_df,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    donations_for_matching = load_donations()
+
+    if donations_for_matching.empty:
+        st.info(
+            "Save a food donation first to find an NGO match."
+        )
+    else:
+        st.markdown("### 🔎 Find a Matching NGO")
+
+        donation_options = {}
+
+        for idx, row in donations_for_matching.iterrows():
+            label = (
+                f"{row['Food']} | {row['Location']} | "
+                f"{int(row['Meals'])} meals | Record {idx + 1}"
+            )
+            donation_options[label] = row
+
+        selected_label = st.selectbox(
+            "Select a food donation",
+            list(donation_options.keys())
+        )
+
+        selected_donation = donation_options[selected_label]
+
+        donation_location = " ".join(
+            str(selected_donation["Location"])
+            .casefold()
+            .replace(",", " ")
+            .replace("-", " ")
+            .split()
+        )
+
+        def same_area(ngo_location):
+            ngo_area = " ".join(
+                str(ngo_location)
+                .casefold()
+                .replace(",", " ")
+                .replace("-", " ")
+                .split()
+            )
+
+            return (
+                donation_location == ngo_area
+                or donation_location in ngo_area
+                or ngo_area in donation_location
+            )
+
+        location_matches = ngo_df[
+            ngo_df["Location"].apply(same_area)
+        ]
+
+        required_meals = int(selected_donation["Meals"])
+
+        suitable_matches = location_matches[
+            location_matches["Daily Meal Capacity"] >= required_meals
+        ]
+
+        if not location_matches.empty:
+            if not suitable_matches.empty:
+                st.success(
+                    f"Found {len(suitable_matches)} potential "
+                    "NGO match(es) with sufficient stated capacity."
+                )
+                st.dataframe(
+                    suitable_matches,
+                    use_container_width=True,
+                    hide_index=True
+                )
+            else:
+                st.warning(
+                    "NGOs were found in the matching area, "
+                    "but none has a stated meal capacity "
+                    "large enough for this donation."
+                )
+                st.dataframe(
+                    location_matches,
+                    use_container_width=True,
+                    hide_index=True
+                )
+        else:
+            st.warning(
+                "No NGO with a matching location was found. "
+                "Register a partner using the same town or area."
+            )
+
+        st.caption(
+            "Demo matching only: area text and stated capacity "
+            "are used. NGO availability, food acceptance and "
+            "actual partnerships are not verified. Contact the "
+            "NGO and confirm before arranging delivery."
+        )
+
+# ========== END NGO MATCHING SYSTEM ==========
 # ================= FOODBRIDGE AI CHATBOT =================
+
 
 st.divider()
 st.subheader("🤖 FoodBridge AI Assistant")
