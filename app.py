@@ -1,9 +1,55 @@
 import pandas as pd
 import streamlit as st
 from sklearn.tree import DecisionTreeClassifier
+import sqlite3
 
 st.set_page_config(page_title="FoodBridge AI", page_icon="🍲", layout="wide")
+# ========== DATABASE FUNCTIONS ==========
 
+DB_FILE = "foodbridge.db"
+
+
+def init_database():
+    with sqlite3.connect(DB_FILE) as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS donations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                food TEXT NOT NULL,
+                meals INTEGER NOT NULL,
+                hours_until_expiry REAL NOT NULL,
+                location TEXT NOT NULL,
+                demo_priority TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+
+def save_donation(food, meals, hours, location, priority):
+    with sqlite3.connect(DB_FILE) as conn:
+        conn.execute("""
+            INSERT INTO donations
+            (food, meals, hours_until_expiry, location, demo_priority)
+            VALUES (?, ?, ?, ?, ?)
+        """, (food, meals, hours, location, priority))
+
+
+def load_donations():
+    with sqlite3.connect(DB_FILE) as conn:
+        return pd.read_sql_query("""
+            SELECT
+                food AS "Food",
+                meals AS "Meals",
+                hours_until_expiry AS "Hours Until Expiry",
+                location AS "Location",
+                demo_priority AS "Demo Priority"
+            FROM donations
+            ORDER BY id
+        """, conn)
+
+
+init_database()
+
+# ========== END DATABASE FUNCTIONS ==========
 
 # FoodBridge AI - Visual Enhancements
 st.markdown("""
