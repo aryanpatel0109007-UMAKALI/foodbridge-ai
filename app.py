@@ -566,18 +566,24 @@ if "fb_logged_in" not in st.session_state:
     st.session_state.fb_logged_in = False
 
 if not st.session_state.fb_logged_in:
+
     st.title("🔐 FoodBridge AI Login")
     st.write("Login or create an account to continue.")
 
-    login_tab, signup_tab = st.tabs(
-        ["Login", "Create Account"]
+    auth_mode = st.radio(
+        "Choose an option:",
+        ["Login", "Create Account"],
+        horizontal=True,
+        key="fb_auth_mode"
     )
 
-    with login_tab:
+    if auth_mode == "Login":
+
         with st.form("fb_login_form"):
             username = st.text_input("Username")
             password = st.text_input(
-                "Password", type="password"
+                "Password",
+                type="password"
             )
             login_button = st.form_submit_button("Login")
 
@@ -592,25 +598,27 @@ if not st.session_state.fb_logged_in:
             else:
                 st.error("Invalid username or password.")
 
-    with signup_tab:
+    else:
+
         with st.form("fb_signup_form"):
-            new_username = st.text_input(
-                "Choose Username", key="fb_new_username"
-            )
+            new_username = st.text_input("Choose Username")
+
             new_password = st.text_input(
                 "Create Password (minimum 8 characters)",
-                type="password",
-                key="fb_new_password"
+                type="password"
             )
+
             confirm_password = st.text_input(
-                "Confirm Password", type="password"
+                "Confirm Password",
+                type="password"
             )
+
             new_role = st.selectbox(
-                "Account Type", ["Donor", "NGO"]
+                "Account Type",
+                ["Donor", "NGO"]
             )
-            signup_button = st.form_submit_button(
-                "Create Account"
-            )
+
+            signup_button = st.form_submit_button("Create Account")
 
         if signup_button:
             if len(new_username.strip()) < 3:
@@ -621,7 +629,9 @@ if not st.session_state.fb_logged_in:
                 st.error("Passwords do not match.")
             else:
                 created = create_auth_user(
-                    new_username, new_password, new_role
+                    new_username,
+                    new_password,
+                    new_role
                 )
 
                 if created:
@@ -637,6 +647,8 @@ if not st.session_state.fb_logged_in:
                     )
 
     st.stop()
+
+# ========== END LOGIN AND SIGNUP UI ==========
 # Sidebar account information
 st.sidebar.markdown("### 👤 My Account")
 st.sidebar.write(
