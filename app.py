@@ -656,7 +656,15 @@ if not st.session_state.fb_logged_in:
             else:
                 st.error("Invalid username or password.")
 
+   
     else:
+        # New users can register as Donors.
+        # NGO accounts should be approved separately.
+        new_role = "Donor"
+
+        st.caption(
+            "NGO accounts require administrator approval."
+        )
 
         with st.form("fb_signup_form"):
             new_username = st.text_input("Choose Username")
@@ -671,20 +679,24 @@ if not st.session_state.fb_logged_in:
                 type="password"
             )
 
-            new_role = "Donor"
-st.caption(
-    "NGO accounts require administrator approval."
-)
-
-            signup_button = st.form_submit_button("Create Account")
+            signup_button = st.form_submit_button(
+                "Create Account"
+            )
 
         if signup_button:
             if len(new_username.strip()) < 3:
-                st.error("Username must be at least 3 characters.")
+                st.error(
+                    "Username must be at least 3 characters."
+                )
+
             elif len(new_password) < 8:
-                st.error("Password must be at least 8 characters.")
+                st.error(
+                    "Password must be at least 8 characters."
+                )
+
             elif new_password != confirm_password:
                 st.error("Passwords do not match.")
+
             else:
                 created = create_auth_user(
                     new_username,
@@ -699,6 +711,7 @@ st.caption(
                     )
                     st.session_state.fb_role = new_role
                     st.rerun()
+
                 else:
                     st.error(
                         "Username already exists. Choose another."
