@@ -857,48 +857,23 @@ st.caption(
     "for available food donations."
 )
 
-# NGO registration access control
-
 register_ngo = False
 
 if st.session_state.get("fb_role") == "NGO":
-
-    with st.expander(
-        "➕ Register a New NGO",
-        expanded=False
-    ):
-        with st.form(
-            "ngo_registration_form",
-            clear_on_submit=True
-        ):
+    with st.expander("➕ Register a New NGO", expanded=False):
+        with st.form("ngo_registration_form", clear_on_submit=True):
             ngo_name = st.text_input("NGO Name")
-
-            ngo_location = st.text_input(
-                "NGO Location / Service Area",
-                placeholder="e.g. Ahmedabad or Kuvasana, Patan"
-            )
-
-            ngo_contact = st.text_input(
-                "Public Contact (optional)",
-                placeholder="Official phone or email"
-            )
-
+            ngo_location = st.text_input("NGO Location / Service Area")
+            ngo_contact = st.text_input("Public Contact (optional)")
             ngo_capacity = st.number_input(
                 "Daily Meal Capacity",
                 min_value=1,
                 value=50,
                 step=10
             )
-
-            register_ngo = st.form_submit_button(
-                "Register NGO"
-            )
-
+            register_ngo = st.form_submit_button("Register NGO")
 else:
-    st.info(
-        "NGO registration is available to NGO accounts only. "
-        "Please log in with an NGO account."
-    )
+    st.info("Login with an NGO account to register an NGO.")
 
 if register_ngo:
     if not ngo_name.strip():
@@ -915,28 +890,18 @@ if register_ngo:
         st.success("NGO registered successfully!")
         st.rerun()
 
-
 ngo_df = load_ngo_partners()
 
 if ngo_df.empty:
-    st.info(
-        "No NGO partners registered yet. "
-        "Register an NGO above to begin matching."
-    )
+    st.info("No NGO partners registered yet.")
 else:
     st.markdown("### Registered NGO Partners")
-    st.dataframe(
-        ngo_df,
-        use_container_width=True,
-        hide_index=True
-    )
+    st.dataframe(ngo_df, use_container_width=True, hide_index=True)
 
-      donations_for_matching = load_donations(show_all=True)
+    donations_for_matching = load_donations(show_all=True)
 
     if donations_for_matching.empty:
-        st.info(
-            "Save a food donation first to find an NGO match."
-        )
+        st.info("Save a food donation first to find an NGO match.")
     else:
         st.markdown("### 🔎 Find a Matching NGO")
 
@@ -953,34 +918,15 @@ else:
             "Select a food donation",
             list(donation_options.keys())
         )
-
         selected_donation = donation_options[selected_label]
 
-        donation_location = " ".join(
-            str(selected_donation["Location"])
-            .casefold()
-            .replace(",", " ")
-            .replace("-", " ")
-            .split()
-        )
-
-        def same_area(ngo_location):
-            ngo_area = " ".join(
-                str(ngo_location)
-                .casefold()
-                .replace(",", " ")
-                .replace("-", " ")
-                .split()
-            )
-
-            return (
-                donation_location == ngo_area
-                or donation_location in ngo_area
-                or ngo_area in donation_location
-            )
+        donation_location = str(
+            selected_donation["Location"]
+        ).strip().casefold()
 
         location_matches = ngo_df[
-            ngo_df["Location"].apply(same_area)
+            ngo_df["Location"].astype(str).str.strip().str.casefold()
+            == donation_location
         ]
 
         required_meals = int(selected_donation["Meals"])
@@ -989,39 +935,32 @@ else:
             location_matches["Daily Meal Capacity"] >= required_meals
         ]
 
-        if not location_matches.empty:
-            if not suitable_matches.empty:
-                st.success(
-                    f"Found {len(suitable_matches)} potential "
-                    "NGO match(es) with sufficient stated capacity."
-                )
-                st.dataframe(
-                    suitable_matches,
-                    use_container_width=True,
-                    hide_index=True
-                )
-            else:
-                st.warning(
-                    "NGOs were found in the matching area, "
-                    "but none has a stated meal capacity "
-                    "large enough for this donation."
-                )
-                st.dataframe(
-                    location_matches,
-                    use_container_width=True,
-                    hide_index=True
-                )
+        if not suitable_matches.empty:
+            st.success("Potential NGO matches found!")
+            st.dataframe(
+                suitable_matches,
+                use_container_width=True,
+                hide_index=True
+            )
+        elif not location_matches.empty:
+            st.warning(
+                "Matching-area NGOs found, but their stated meal "
+                "capacity is insufficient for this donation."
+            )
+            st.dataframe(
+                location_matches,
+                use_container_width=True,
+                hide_index=True
+            )
         else:
             st.warning(
-                "No NGO with a matching location was found. "
-                "Register a partner using the same town or area."
+                "No NGO found in the same location. "
+                "Register an NGO for that location first."
             )
 
         st.caption(
-            "Demo matching only: area text and stated capacity "
-            "are used. NGO availability, food acceptance and "
-            "actual partnerships are not verified. Contact the "
-            "NGO and confirm before arranging delivery."
+            "Demo matching only. Confirm NGO availability and food "
+            "acceptance directly before arranging delivery."
         )
 
 # ========== END NGO MATCHING SYSTEM ==========
