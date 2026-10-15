@@ -2,6 +2,9 @@ import pandas as pd
 import streamlit as st
 from sklearn.tree import DecisionTreeClassifier
 import sqlite3
+import hashlib
+import hmac
+import secrets
 
 st.set_page_config(page_title="FoodBridge AI", page_icon="🍲", layout="wide")
 # ========== DATABASE FUNCTIONS ==========
@@ -51,6 +54,82 @@ init_database()
 
 # ========== END DATABASE FUNCTIONS ==========
 # ========== NGO DATABASE ==========
+# ========== USER AUTHENTICATION ==========
+
+def init_auth_database():
+    with sqlite3.connect(DB_FILE) as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS app_users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                salt TEXT NOT NULL,
+                role TEXT NOT NULL,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+
+def create_auth_user(username, password, role):
+    username = username.strip().lower()
+    salt = secrets.token_bytes(16)
+
+    password_hash = hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode("utf-8"),
+        salt,
+        200000
+    ).hex()
+
+    try:
+        with sqlite3.connect(DB_FILE) as conn:
+            conn.execute("""
+                INSERT INTO app_users
+                (username, password_hash, salt, role)
+                VALUES (?, ?, ?, ?)
+            """, (
+                username,
+                password_hash,
+                salt.hex(),
+                role
+            ))
+        return True
+    except sqlite3.IntegrityError:
+        return False
+
+
+def authenticate_auth_user(username, password):
+    username = username.strip().lower()
+
+    with sqlite3.connect(DB_FILE) as conn:
+        user = conn.execute("""
+            SELECT username, password_hash, salt, role
+            FROM app_users
+            WHERE username = ?
+        """, (username,)).fetchone()
+
+    if user is None:
+        return None
+
+    actual_hash = hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode("utf-8"),
+        bytes.fromhex(user[2]),
+        200000
+    ).hex()
+
+    if hmac.compare_digest(actual_hash, user[1]):
+        return {
+            "username": user[0],
+            "role": user[3]
+        }
+
+    return None
+
+
+init_auth_database()
+
+# ========== END AUTHENTICATION ==========
 
 def init_ngo_database():
     with sqlite3.connect(DB_FILE) as conn:
@@ -452,8 +531,115 @@ div[data-testid="stVerticalBlockBorderWrapper"]:hover {
 </style>
 """, unsafe_allow_html=True)
 
+# ========== LOGIN AND SIGNUP UI ==========
+
+if "fb_logged_in" not in st.session_state:
+    st.session_state.fb_logged_in = False
+
+if not st.session_state.fb_logged_in:
+    st.title("🔐 FoodBridge AI Login")
+    st.write("Login or create an account to continue.")
+
+    login_tab, signup_tab = st.tabs([
+        "Login",
+        "Create Account"
+    ])
+
+    with login_tab:
+        with st.form("fb_login_form"):
+            login_username = st.text_input("Username")
+            login_password = st.text_input(
+                "Password",
+                type="password"
+            )
+            login_button = st.form_submit_button("Login")
+
+        if login_button:
+            user = authenticate_auth_user(
+                login_username,
+                login_password
+            )
+
+            if user:
+                st.session_state.fb_logged_in = True
+                st.session_state.fb_username = user["username"]
+                st.session_state.fb_role = user["role"]
+                st.rerun()
+            else:
+                st.error("Invalid username or password.")
+
+    with signup_tab:
+        with st.form("fb_signup_form"):
+            new_username = st.text_input(
+                "Choose Username",
+                key="fb_new_username"
+            )
+            new_password = st.text_input(
+                "Create Password (minimum 8 characters)",
+                type="password",
+                key="fb_new_password"
+            )
+            confirm_password = st.text_input(
+                "Confirm Password",
+                type="password"
+            )
+            new_role = st.selectbox(
+                "Account Type",
+                ["Donor", "NGO"]
+            )
+
+            signup_button = st.form_submit_button(
+                "Create Account"
+            )
+
+        if signup_button:
+            if len(new_username.strip()) < 3:
+                st.error("Username must be at least 3 characters.")
+            elif len(new_password) < 8:
+                st.error("Password must be at least 8 characters.")
+            elif new_password != confirm_password:
+                st.error("Passwords do not match.")
+            else:
+                created = create_auth_user(
+                    new_username,
+                    new_password,
+                    new_role
+                )
+
+                if created:
+                    st.session_state.fb_logged_in = True
+                    st.session_state.fb_username = (
+                        new_username.strip().lower()
+                    )
+                    st.session_state.fb_role = new_role
+                    st.rerun()
+                else:
+                    st.error(
+                        "Username already exists. Choose another."
+                    )
+
+    st.stop()
+
+
+# Sidebar account information
+st.sidebar.markdown("### 👤 My Account")
+st.sidebar.write(
+    f"Username: {st.session_state.fb_username}"
+)
+st.sidebar.write(
+    f"Role: {st.session_state.fb_role}"
+)
+
+if st.sidebar.button("Logout"):
+    st.session_state.fb_logged_in = False
+    st.session_state.pop("fb_username", None)
+    st.session_state.pop("fb_role", None)
+    st.rerun()
+
+# ========== END LOGIN UI ==========
 
 # IMPORTANT: this is a demo model trained on artificial practice data.
+
 # It is not a food-safety assessment or a real-world donation priority model.
 training_df = pd.DataFrame({"hours_until_expiry": list(range(1, 16))})
 training_df["priority"] = training_df["hours_until_expiry"].apply(
@@ -607,25 +793,48 @@ st.caption(
     "for available food donations."
 )
 
-with st.expander("➕ Register a New NGO", expanded=False):
-    with st.form("ngo_registration_form", clear_on_submit=True):
-        ngo_name = st.text_input("NGO Name")
-        ngo_location = st.text_input(
-            "NGO Location / Service Area",
-            placeholder="e.g. Ahmedabad or Kuvasana, Patan"
-        )
-        ngo_contact = st.text_input(
-            "Public Contact (optional)",
-            placeholder="Official phone or email"
-        )
-        ngo_capacity = st.number_input(
-            "Daily Meal Capacity",
-            min_value=1,
-            value=50,
-            step=10
-        )
+# NGO registration access control
 
-        register_ngo = st.form_submit_button("Register NGO")
+register_ngo = False
+
+if st.session_state.get("fb_role") == "NGO":
+
+    with st.expander(
+        "➕ Register a New NGO",
+        expanded=False
+    ):
+        with st.form(
+            "ngo_registration_form",
+            clear_on_submit=True
+        ):
+            ngo_name = st.text_input("NGO Name")
+
+            ngo_location = st.text_input(
+                "NGO Location / Service Area",
+                placeholder="e.g. Ahmedabad or Kuvasana, Patan"
+            )
+
+            ngo_contact = st.text_input(
+                "Public Contact (optional)",
+                placeholder="Official phone or email"
+            )
+
+            ngo_capacity = st.number_input(
+                "Daily Meal Capacity",
+                min_value=1,
+                value=50,
+                step=10
+            )
+
+            register_ngo = st.form_submit_button(
+                "Register NGO"
+            )
+
+else:
+    st.info(
+        "NGO registration is available to NGO accounts only. "
+        "Please log in with an NGO account."
+    )
 
 if register_ngo:
     if not ngo_name.strip():
