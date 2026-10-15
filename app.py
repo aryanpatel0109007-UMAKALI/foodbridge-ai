@@ -671,10 +671,10 @@ if not st.session_state.fb_logged_in:
                 type="password"
             )
 
-            new_role = st.selectbox(
-                "Account Type",
-                ["Donor", "NGO"]
-            )
+            new_role = "Donor"
+st.caption(
+    "NGO accounts require administrator approval."
+)
 
             signup_button = st.form_submit_button("Create Account")
 
@@ -720,6 +720,8 @@ if st.sidebar.button("Logout"):
     st.session_state.fb_logged_in = False
     st.session_state.pop("fb_username", None)
     st.session_state.pop("fb_role", None)
+    st.session_state.pop("fb_chat_history", None)
+st.session_state.pop("fb_chat_language", None)
     st.rerun()
 
 # ========== END LOGIN UI ==========
