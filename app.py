@@ -1184,6 +1184,47 @@ labels = CHAT_LANGUAGES[chat_language]
 def get_foodbridge_reply(question, language):
     q = question.casefold()
     answers = RESPONSES[language]
+    
+    # Check delivery partnership questions FIRST
+    partner_keywords = [
+        "blinkit", "zepto",
+        "બ્લિંકિટ", "ઝેપ્ટો",
+        "ब्लिंकिट", "ज़ेप्टो", "जेप्टो",
+        "partnership", "delivery partner",
+        "પાર્ટનરશિપ", "ડિલિવરી",
+        "साझेदारी", "डिलीवरी पार्टनर"
+    ]
+
+    if any(word in q for word in partner_keywords):
+        partner_replies = {
+            "English": (
+                "🚚 FoodBridge AI Partner Connect\n\n"
+                "We want to explore partnerships with Blinkit "
+                "and Zepto to help coordinate food donations.\n\n"
+                "Direct integration is not available yet. "
+                "Official company approval or API access is required. "
+                "No delivery can be booked through this demo."
+            ),
+            "ગુજરાતી": (
+                "🚚 FoodBridge AI પાર્ટનર કનેક્ટ\n\n"
+                "અમે ખોરાકના દાન માટે Blinkit અને Zepto સાથે "
+                "પાર્ટનરશિપની શક્યતાઓ તપાસવા માગીએ છીએ.\n\n"
+                "હાલમાં સીધું જોડાણ ઉપલબ્ધ નથી. કંપનીની "
+                "મંજૂરી અથવા અધિકૃત API જરૂરી છે. આ ડેમો દ્વારા "
+                "હાલ ડિલિવરી બુક કરી શકાતી નથી."
+            ),
+            "हिन्दी": (
+                "🚚 FoodBridge AI पार्टनर कनेक्ट\n\n"
+                "हम भोजन दान के लिए Blinkit और Zepto के साथ "
+                "पार्टनरशिप की संभावनाएँ तलाशना चाहते हैं।\n\n"
+                "अभी सीधा कनेक्शन उपलब्ध नहीं है। कंपनी की "
+                "अनुमति या आधिकारिक API आवश्यक है। इस डेमो से "
+                "अभी डिलीवरी बुक नहीं की जा सकती।"
+            )
+        }
+
+        return partner_replies[language]
+
 
     # Check NGO questions first
     if any(word in q for word in [
