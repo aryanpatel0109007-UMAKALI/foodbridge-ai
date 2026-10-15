@@ -219,6 +219,25 @@ div[data-testid="stTabs"] button p {
     color: #183b2a !important;
     opacity: 1 !important;
 }
+/* Fix invisible Login and Create Account tabs */
+div[data-testid="stTabs"] button[role="tab"],
+div[data-testid="stTabs"] button[role="tab"] p,
+div[data-testid="stTabs"] [data-baseweb="tab"] {
+    color: #183b2a !important;
+    opacity: 1 !important;
+}
+
+/* Highlight the active tab */
+div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+    color: #16764b !important;
+    font-weight: 700 !important;
+}
+
+/* Make form labels visible */
+.stApp [data-testid="stForm"] label {
+    color: #183b2a !important;
+    opacity: 1 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
