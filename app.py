@@ -456,20 +456,21 @@ if submitted:
         prediction = model.predict(
             pd.DataFrame({"hours_until_expiry": [float(hours)]})
         )[0]
-        st.session_state.donations.append({
-            "Food": food.strip(),
-            "Meals": int(meals),
-            "Hours Until Expiry": float(hours),
-            "Location": location.strip(),
-            "Demo Priority": prediction,
-        })
-        st.success(f"Donation added to this app session. Demonstration priority: {prediction}")
+       save_donation(
+    food=food.strip(),
+    meals=int(meals),
+    hours=float(hours),
+    location=location.strip(),
+    priority=str(prediction)
+)
 
+st.success(
+    f"Donation saved to database! "
+    f"Demonstration priority: {prediction}"
+)
 st.divider()
 st.subheader("Donation dashboard")
-df = pd.DataFrame(st.session_state.donations, columns=[
-    "Food", "Meals", "Hours Until Expiry", "Location", "Demo Priority"
-])
+df = load_donations()
 total_donations = len(df)
 total_meals = int(df["Meals"].sum()) if not df.empty else 0
 col1, col2 = st.columns(2)
