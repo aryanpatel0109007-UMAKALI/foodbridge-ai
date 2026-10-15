@@ -875,7 +875,57 @@ st.caption(
     "Storage note: this beginner deployment keeps donations only in the current browser session. "
     "Download the CSV to keep a copy. A persistent database is needed before real-world use."
 )
+# ========== DONATION STATUS MANAGEMENT ==========
 
+if st.session_state.get("fb_role") == "NGO":
+
+    st.divider()
+    st.subheader("📦 Donation Status Management")
+
+    status_df = load_donations(show_all=True)
+
+    if status_df.empty:
+        st.info("No donations available yet.")
+    else:
+        status_options = {}
+
+        for _, row in status_df.iterrows():
+            label = (
+                f"#{int(row['Donation ID'])} - "
+                f"{row['Food']} - {row['Location']} "
+                f"({row['Status']})"
+            )
+            status_options[label] = int(row["Donation ID"])
+
+        selected_label = st.selectbox(
+            "Select a donation",
+            list(status_options.keys()),
+            key="status_donation_choice"
+        )
+
+        selected_id = status_options[selected_label]
+
+        current_record = status_df[
+            status_df["Donation ID"] == selected_id
+        ].iloc[0]
+
+        status_choices = ["Pending", "Accepted", "Completed"]
+
+        new_status = st.selectbox(
+            "Update status",
+            status_choices,
+            index=status_choices.index(
+                current_record["Status"]
+            ),
+            key="new_donation_status"
+        )
+
+        if st.button("Update Donation Status"):
+            update_donation_status(selected_id, new_status)
+            st.success(f"Donation status updated to {new_status}!")
+            st.rerun()
+
+# ========== END DONATION STATUS MANAGEMENT ==========
 # ========== NGO MATCHING SYSTEM ==========
 
 st.divider()
@@ -927,7 +977,10 @@ else:
     st.markdown("### Registered NGO Partners")
     st.dataframe(ngo_df, use_container_width=True, hide_index=True)
 
-    donations_for_matching = load_donations(show_all=True)
+    donations_for_matching = load_donations(
+    show_all=True,
+    status_filter="Pending"
+)
 
     if donations_for_matching.empty:
         st.info("Save a food donation first to find an NGO match.")
