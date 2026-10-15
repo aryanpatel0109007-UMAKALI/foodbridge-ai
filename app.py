@@ -454,20 +454,23 @@ if submitted:
         st.error("Enter a number of meals greater than zero.")
     else:
         prediction = model.predict(
-            pd.DataFrame({"hours_until_expiry": [float(hours)]})
+            pd.DataFrame({
+                "hours_until_expiry": [float(hours)]
+            })
         )[0]
-       save_donation(
-    food=food.strip(),
-    meals=int(meals),
-    hours=float(hours),
-    location=location.strip(),
-    priority=str(prediction)
-)
 
-st.success(
-    f"Donation saved to database! "
-    f"Demonstration priority: {prediction}"
-)
+        save_donation(
+            food=food.strip(),
+            meals=int(meals),
+            hours=float(hours),
+            location=location.strip(),
+            priority=str(prediction)
+        )
+
+        st.success(
+            f"Donation saved to database! "
+            f"Demonstration priority: {prediction}"
+        )        
 st.divider()
 st.subheader("Donation dashboard")
 df = load_donations()
