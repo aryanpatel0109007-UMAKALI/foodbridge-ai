@@ -506,3 +506,218 @@ st.caption(
     "Storage note: this beginner deployment keeps donations only in the current browser session. "
     "Download the CSV to keep a copy. A persistent database is needed before real-world use."
 )
+
+# ================= FOODBRIDGE AI CHATBOT =================
+
+st.divider()
+st.subheader("🤖 FoodBridge AI Assistant")
+
+CHAT_LANGUAGES = {
+    "English": {
+        "title": "Ask your question",
+        "button": "Send Message",
+        "empty": "Please enter a question.",
+        "you": "You",
+        "bot": "FoodBridge Assistant",
+    },
+    "ગુજરાતી": {
+        "title": "તમારો પ્રશ્ન પૂછો",
+        "button": "મોકલો",
+        "empty": "કૃપા કરીને પ્રશ્ન લખો.",
+        "you": "તમે",
+        "bot": "FoodBridge સહાયક",
+    },
+    "हिन्दी": {
+        "title": "अपना सवाल पूछें",
+        "button": "भेजें",
+        "empty": "कृपया अपना सवाल लिखें।",
+        "you": "आप",
+        "bot": "FoodBridge सहायक",
+    },
+}
+
+RESPONSES = {
+    "English": {
+        "donation": (
+            "Use the Register a food donation form above. "
+            "Enter food name, location, number of meals, and "
+            "hours until expiry. Then click Save donation."
+        ),
+        "ngo": (
+            "Real NGO matching is not connected yet. "
+            "The next development step is to create an NGO "
+            "directory and match donations with nearby NGOs."
+        ),
+        "priority": (
+            "Priority is a demonstration prediction based on "
+            "hours until expiry. It is NOT a food-safety check."
+        ),
+        "database": (
+            "Donations currently stay in the Streamlit session. "
+            "Use Download donations as CSV to keep a copy. "
+            "Permanent database storage is not added yet."
+        ),
+        "about": (
+            "FoodBridge AI aims to reduce food waste by "
+            "connecting surplus food with community needs."
+        ),
+        "default": (
+            "I can help with food donation, NGO matching, "
+            "priority labels, and saving donation records."
+        ),
+    },
+    "ગુજરાતી": {
+        "donation": (
+            "ઉપરના Register a food donation ફોર્મમાં ખોરાકનું "
+            "નામ, સ્થળ, ભોજનની સંખ્યા અને expiry સુધીના કલાકો "
+            "ભરો. પછી Save donation પર ક્લિક કરો."
+        ),
+        "ngo": (
+            "હાલમાં વાસ્તવિક NGO matching જોડાયેલું નથી. "
+            "આગળ નજીકની NGO ની યાદી બનાવીને ડોનેશન સાથે "
+            "મેચ કરવાની સુવિધા ઉમેરવાની છે."
+        ),
+        "priority": (
+            "Priority એ expiry સુધીના કલાકો પરથી મળતું "
+            "ડેમો અનુમાન છે. તે ખોરાક સુરક્ષિત છે કે નહીં "
+            "તેની તપાસ નથી."
+        ),
+        "database": (
+            "હાલના ડોનેશન રેકોર્ડ Streamlit session માં રહે છે. "
+            "રેકોર્ડ સાચવવા Download donations as CSV વાપરો. "
+            "કાયમી database હજી ઉમેર્યો નથી."
+        ),
+        "about": (
+            "FoodBridge AI નો હેતુ વધારાના ખોરાકનો બગાડ "
+            "ઘટાડવો અને ખોરાકને જરૂરિયાતમંદ લોકો સુધી "
+            "પહોંચાડવામાં મદદ કરવાનો છે."
+        ),
+        "default": (
+            "હું ફૂડ ડોનેશન, NGO matching, priority અને "
+            "ડોનેશન રેકોર્ડ સાચવવા વિશે મદદ કરી શકું છું."
+        ),
+    },
+    "हिन्दी": {
+        "donation": (
+            "ऊपर दिए गए Register a food donation फॉर्म में "
+            "खाने का नाम, स्थान, भोजन की संख्या और समाप्ति "
+            "तक के घंटे भरें। फिर Save donation पर क्लिक करें।"
+        ),
+        "ngo": (
+            "अभी वास्तविक NGO matching जुड़ी हुई नहीं है। "
+            "अगले चरण में आसपास की NGOs की सूची बनाकर "
+            "दान का मिलान किया जाएगा।"
+        ),
+        "priority": (
+            "Priority समाप्ति तक बचे घंटों पर आधारित "
+            "एक डेमो अनुमान है। यह भोजन की सुरक्षा की "
+            "जाँच नहीं करता।"
+        ),
+        "database": (
+            "दान के रिकॉर्ड अभी Streamlit session में रहते हैं। "
+            "रिकॉर्ड रखने के लिए Download donations as CSV "
+            "का उपयोग करें। स्थायी database अभी नहीं जोड़ा गया है।"
+        ),
+        "about": (
+            "FoodBridge AI का उद्देश्य अतिरिक्त भोजन की "
+            "बर्बादी कम करना और भोजन को जरूरतमंद लोगों "
+            "तक पहुँचाने में मदद करना है।"
+        ),
+        "default": (
+            "मैं भोजन दान, NGO matching, priority और "
+            "दान के रिकॉर्ड के बारे में मदद कर सकता हूँ।"
+        ),
+    },
+}
+
+chat_language = st.selectbox(
+    "🌐 Chatbot Language / ભાષા / भाषा",
+    ["English", "ગુજરાતી", "हिन्दी"],
+    key="fb_chat_language",
+)
+
+labels = CHAT_LANGUAGES[chat_language]
+
+
+def get_foodbridge_reply(question, language):
+    q = question.casefold()
+    answers = RESPONSES[language]
+
+    # Check NGO questions first
+    if any(word in q for word in [
+        "ngo", "charity", "organization",
+        "એનજીઓ", "સંસ્થા", "સંસ્થાને",
+        "एनजीओ", "संस्था",
+    ]):
+        return answers["ngo"]
+
+    # Donation storage questions
+    if any(word in q for word in [
+        "database", "csv", "download", "save", "storage",
+        "ડેટાબેઝ", "ડેટાબેસ", "ડાઉનલોડ", "સાચવ",
+        "डेटाबेस", "डाउनलोड", "सेव", "सहेज",
+    ]):
+        return answers["database"]
+
+    # Priority and expiry questions
+    if any(word in q for word in [
+        "priority", "expiry", "expire", "food safe", "safety",
+        "પ્રાયોરિટી", "પ્રાથમિકતા", "એક્સપાયરી",
+        "સુરક્ષિત", "પ્રાથમિક", "કલાક",
+        "प्राथमिकता", "समाप्ति", "सुरक्षित", "घंटे",
+    ]):
+        return answers["priority"]
+
+    # Donation questions
+    if any(word in q for word in [
+        "donation", "donate", "register", "food", "meal",
+        "દાન", "ખોરાક", "ભોજન", "જમવાનું",
+        "दान", "खाना", "भोजन",
+    ]):
+        return answers["donation"]
+
+    # Project information
+    if any(word in q for word in [
+        "about", "purpose", "what is", "help",
+        "હેતુ", "વિશે", "શું છે", "મદદ",
+        "उद्देश्य", "क्या है", "मदद",
+    ]):
+        return answers["about"]
+
+    return answers["default"]
+
+
+if "fb_chat_history" not in st.session_state:
+    st.session_state.fb_chat_history = []
+
+with st.form("fb_chat_form", clear_on_submit=True):
+    question = st.text_input(
+        labels["title"],
+        placeholder="Ask about donations, NGOs, or priority...",
+    )
+
+    send_message = st.form_submit_button(
+        labels["button"],
+        use_container_width=True,
+    )
+
+if send_message:
+    if not question.strip():
+        st.warning(labels["empty"])
+    else:
+        answer = get_foodbridge_reply(
+            question.strip(),
+            chat_language,
+        )
+
+        st.session_state.fb_chat_history.append({
+            "question": question.strip(),
+            "answer": answer,
+            "language": chat_language,
+        })
+
+for message in st.session_state.fb_chat_history:
+    st.markdown(f"**{labels['you']}:** {message['question']}")
+    st.info(message["answer"])
+
+# ================= END CHATBOT =================
