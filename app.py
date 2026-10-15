@@ -788,19 +788,20 @@ if submitted:
             })
         )[0]
 
-       save_donation(
-    food=food.strip(),
-    meals=int(meals),
-    hours=float(hours),
-    location=location.strip(),
-    priority=str(prediction),
-    donated_by=st.session_state.fb_username
-)
+        save_donation(
+            food=food.strip(),
+            meals=int(meals),
+            hours=float(hours),
+            location=location.strip(),
+            priority=str(prediction),
+            donated_by=st.session_state.fb_username
+        )
 
         st.success(
             f"Donation saved to database! "
             f"Demonstration priority: {prediction}"
-        )        
+        )
+        
 st.divider()
 st.subheader("Donation dashboard")
 current_role = st.session_state.get("fb_role", "Donor")
