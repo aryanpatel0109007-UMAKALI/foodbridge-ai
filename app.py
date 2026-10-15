@@ -23,11 +23,11 @@ def init_database():
                 location TEXT NOT NULL,
                 demo_priority TEXT NOT NULL,
                 donated_by TEXT NOT NULL DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'Pending',
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
         """)
 
-        # Add column to an existing database if needed
         columns = {
             row[1]
             for row in conn.execute(
@@ -41,43 +41,72 @@ def init_database():
                 ADD COLUMN donated_by TEXT NOT NULL DEFAULT ''
             """)
 
+        if "status" not in columns:
+            conn.execute("""
+                ALTER TABLE donations
+                ADD COLUMN status TEXT NOT NULL DEFAULT 'Pending'
+            """)
 
-def save_donation(food, meals, hours, location, priority, donated_by):
+
+def save_donation(food, meals, hours, location, priority, donated_by=""):
     with sqlite3.connect(DB_FILE) as conn:
         conn.execute("""
             INSERT INTO donations (
                 food, meals, hours_until_expiry,
-                location, demo_priority, donated_by
+                location, demo_priority, donated_by, status
             )
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, 'Pending')
         """, (
             food, meals, hours, location, priority, donated_by
         ))
 
 
-def load_donations(show_all=False, username=None):
+def load_donations(show_all=False, username=None, status_filter=None):
     query = """
         SELECT
+            id AS "Donation ID",
             food AS "Food",
             meals AS "Meals",
             hours_until_expiry AS "Hours Until Expiry",
             location AS "Location",
-            demo_priority AS "Demo Priority"
+            demo_priority AS "Demo Priority",
+            status AS "Status"
         FROM donations
     """
 
-    params = ()
+    conditions = []
+    params = []
 
     if not show_all:
-        query += " WHERE donated_by = ?"
-        params = (username or "",)
+        conditions.append("donated_by = ?")
+        params.append(username or "")
 
-    query += " ORDER BY id"
+    if status_filter is not None:
+        conditions.append("status = ?")
+        params.append(status_filter)
+
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+
+    query += " ORDER BY id DESC"
 
     with sqlite3.connect(DB_FILE) as conn:
-        return pd.read_sql_query(
-            query, conn, params=params
-        )
+        return pd.read_sql_query(query, conn, params=params)
+
+
+def update_donation_status(donation_id, new_status):
+    allowed_statuses = {"Pending", "Accepted", "Completed"}
+
+    if new_status not in allowed_statuses:
+        raise ValueError("Invalid donation status")
+
+    with sqlite3.connect(DB_FILE) as conn:
+        conn.execute("""
+            UPDATE donations
+            SET status = ?
+            WHERE id = ?
+        """, (new_status, donation_id))
+
 
 init_database()
 
